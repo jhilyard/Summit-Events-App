@@ -321,7 +321,7 @@ public with sharing class SummitEventsRegisterAppointmentCtlr {
                 apptToAdd.add(addAppt);
             }
 
-            if (apptToAdd.size() > 0) {
+            if (! apptToAdd.isEmpty()) {
                 apptCRUD.updateAppointments(apptToAdd);
                 addedAppts = true;
             }
@@ -395,7 +395,7 @@ public with sharing class SummitEventsRegisterAppointmentCtlr {
             apptToAdd.add(addAppt);
         }
 
-        if (apptToAdd.size() > 0) {
+        if (! apptToAdd.isEmpty()) {
             apptCRUD.updateAppointments(apptToAdd);
         }
         return submitPage;

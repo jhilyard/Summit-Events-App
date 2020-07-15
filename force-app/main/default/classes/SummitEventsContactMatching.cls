@@ -79,7 +79,7 @@ public with sharing class SummitEventsContactMatching {
 
             List<Contact> hardContactTest1 = CRUDtoDo.findContacts(query);
 
-            if (hardContactTest1.size() > 0) {
+            if (! hardContactTest1.isEmpty()) {
                 contactId = hardContactTest1[0].Id;
 
                 matchLog += '<div class="slds-text-heading_small slds-m-vertical_medium">Hard match on FIRST NAME (first 3), LAST NAME, BIRTH DATE!</div>';
@@ -93,7 +93,7 @@ public with sharing class SummitEventsContactMatching {
         //Test to find if contact already exists - HARD TEST last name and email match
         if (String.isBlank(contactId)) {
             List<Contact> hardContactTest2 = CRUDtoDo.emailLastMatch(email, lastName);
-            if (hardContactTest2.size() > 0) {
+            if (! hardContactTest2.isEmpty()) {
                 contactId = hardContactTest2[0].Id;
                 matchLog += '<div class="slds-text-heading_small slds-m-vertical_medium">Hard match on LAST NAME, EMAIL!</div>';
                 matchLog += matchLogHead;
@@ -111,7 +111,7 @@ public with sharing class SummitEventsContactMatching {
                 possibleEmails.add('Event_Dup_' + String.valueOf(x) + '_' + evt.Registrant_Email__c);
             }
             List<Contact> hardContactTest3 = CRUDtoDo.possibleEmailLastMatches(lastName, possibleEmails);
-            if (hardContactTest3.size() > 0) {
+            if (! hardContactTest3.isEmpty()) {
                 //hard match on first DUP email found.
                 contactId = hardContactTest3[0].Id;
                 matchLog += '<div class="slds-text-heading_small slds-m-vertical_medium">Hard match on LAST NAME, EMAIL (Email was duplicate email)</div>';
@@ -125,7 +125,7 @@ public with sharing class SummitEventsContactMatching {
         if (String.isBlank(contactId) && (matchingScope.startsWith('Full matching') || String.isBlank(matchingScope))) {
             //Check if first name last name zip match
             List<Contact> zipContactTest = CRUDtoDo.zipFirstLastMatch(evt.Registrant_Zip__c, evt.Registrant_Last_Name__c, evt.Registrant_First_Name__c);
-            if (zipContactTest.size() > 0) {
+            if (! zipContactTest.isEmpty()) {
                 //Soft Match found with zip
                 matchLog += '<div class="slds-text-heading_small slds-m-vertical_medium">Soft Match on Zip, Last Name, First Name</div>';
                 matchLog += matchLogHead;
@@ -137,7 +137,7 @@ public with sharing class SummitEventsContactMatching {
                 matchLog += '</tbody></table>';
             }
             List<Contact> emailContactTest = CRUDtoDo.emailOnlyMatch(evt.Registrant_Email__c);
-            if (emailContactTest.size() > 0) {
+            if (! emailContactTest.isEmpty()) {
                 //Soft Match found with email
                 matchLog += '<div class="slds-text-heading_small slds-m-vertical_medium">Soft Match on Email</div>';
                 matchLog += matchLogHead;
@@ -566,7 +566,7 @@ public with sharing class SummitEventsContactMatching {
                 softContactTestNamePhoneClass = CRUDtoDo.findContacts(query);
             }
 
-            if (softContactTestNamePhoneClass.size() > 0) {
+            if (! softContactTestNamePhoneClass.isEmpty()) {
                 matchLog += '<div class="slds-text-heading_small slds-m-vertical_medium">Soft Matches on LAST NAME, PHONE and CLASS.</div>';
                 matchLog += matchLogHead;
                 matchLog += '<tbody>';

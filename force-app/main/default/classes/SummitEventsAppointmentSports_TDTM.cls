@@ -22,13 +22,13 @@ global class SummitEventsAppointmentSports_TDTM extends hed.TDTM_Runnable {
                     athleticRegistrationIds.put(appointment.id, appointment.Event_Registration__c);
                 }
             }
-            if (athleticRegistrationIds.size() > 0) {
+            if (! athleticRegistrationIds.isEmpty()) {
                 Map<Id, Summit_Events_Registration__c> sportsAffectedRegistrations = new Map<id, Summit_Events_Registration__c>([
                         SELECT id, Contact__r.Id, Contact__r.Special_Athlete_Sport_1__c, Contact__r.Special_Athlete_Sport_2__c, Contact__r.Special_Athlete_Sport_3__c
                         FROM Summit_Events_Registration__c
                         WHERE Id IN :athleticRegistrationIds.values()
                 ]);
-                if (sportsAffectedRegistrations.size() > 0) {
+                if (! sportsAffectedRegistrations.isEmpty()) {
 
                     for (Id key : athleticRegistrationIds.keySet()) {
                         Id apptId = key;
@@ -62,7 +62,7 @@ global class SummitEventsAppointmentSports_TDTM extends hed.TDTM_Runnable {
                         }
                     }
                 }
-                if (sportsContacts.size() > 0) {
+                if (! sportsContacts.isEmpty()) {
                     upsert sportsContacts;
                 }
             }

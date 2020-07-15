@@ -34,7 +34,7 @@ public with sharing class SummitEventsAddToCalendarController {
                     WHERE Id = :URLinstanceID
             ];
 
-            if (eventInstanceList.size() > 0) {
+            if (! eventInstanceList.isEmpty()) {
                 evtInfo = eventInstanceList[0];
             }
 

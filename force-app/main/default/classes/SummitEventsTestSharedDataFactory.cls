@@ -190,7 +190,7 @@ public with sharing class SummitEventsTestSharedDataFactory {
 
         List<OrgWideEmailAddress> oweList = [SELECT Id, Address,DisplayName, IsAllowAllProfiles from OrgWideEmailAddress WHERE IsAllowAllProfiles = true];
 
-        if (oweList.size() > 0) {
+        if (! oweList.isEmpty()) {
             testEvtEmail.Org_Email_Id__c = oweList[0].Id;
         }
 /*

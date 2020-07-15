@@ -68,7 +68,7 @@ global without sharing class SummitEventsTouchNetuPayPost {
             WHERE Event_Registration__c = :reg.Id
         ];
 
-        if (eventFees.size() > 0) {
+        if (! eventFees.isEmpty()) {
             //Update fees to connect the payment record to them.
             for (Summit_Events_Fee__c fee:eventFees) {
                 fee.Summit_Events_Payment__c = paymentInformation.Id;

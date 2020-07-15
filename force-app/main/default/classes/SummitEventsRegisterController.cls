@@ -192,7 +192,7 @@ public with sharing class SummitEventsRegisterController {
                     AND (Restrict_To_Instance_Title__r.Instance_Title__c = :evtInstance.Instance_Title__c OR Restrict_To_Instance_Title__r.Instance_Title__c = null)
                     AND Appointment_Type_Status__c = 'Active'
             ];
-            if (apptTypes.size() > 0) {
+            if (! apptTypes.isEmpty()) {
                 evtHasAppointments = true;
             }
 
@@ -274,7 +274,7 @@ public with sharing class SummitEventsRegisterController {
                                 Where Id = :UserInfo.getUserId()
                         )
                 ];
-                if (userAddressList.size() > 0) {
+                if (! userAddressList.isEmpty()) {
                     userAddress = userAddressList[0];
                 }
 
@@ -540,7 +540,7 @@ public with sharing class SummitEventsRegisterController {
              // Missing Major fields in HEDA
              List<Major__c> majorIdList = [SELECT Id From Major__c Where Prog_Major_Conc_Code__c IN :majorCodes];
 
-             if (majorIdList.size() > 0) {
+             if (! majorIdList.isEmpty()) {
                  for (Integer mc = 0; mc < 4; mc++) {
                      if (mc < majorIdList.size()) {
                          if (mc == 0) {
@@ -610,7 +610,7 @@ public with sharing class SummitEventsRegisterController {
                 }
                 matched = matcher.SummitEventsContactMatching(matchingRule, newEvtReg, matchingScope);
                 //Populate matching results into data - matched may be blank depending on the Contact_Creation__c setting
-                if (matched.size() > 0) {
+                if (! matched.isEmpty()) {
                     if (String.isNotBlank(matched.get('contactId'))) {
                         contactId = (Id) matched.get('contactId');
                         newContactCreated = Boolean.valueOf(matched.get('newContactCreated'));
@@ -647,7 +647,7 @@ public with sharing class SummitEventsRegisterController {
                 AND Event_Fee_Type__c != 'Appointment Additional'
                 AND Event_Registration__c = :evtInfo.evtRegId
         ];
-        if (recordedEventFeeList.size() > 0) {
+        if (! recordedEventFeeList.isEmpty()) {
             //Fees already exist so checks need to be made if current fees are there
             List<Id> recordedUsedIds = new list<Id>();
             for (Integer ff = 0; ff < eventFeeList.size(); ff++) {
@@ -669,18 +669,18 @@ public with sharing class SummitEventsRegisterController {
                     AND Event_Registration__c = :evtInfo.evtRegId
                     AND Id NOT IN :recordedUsedIds
             ];
-            if (deleteEventFees.size() > 0) {
+            if (! deleteEventFees.isEmpty()) {
                 CRUDtoDo.deleteFees(deleteEventFees);
             }
         } else {
             //No Fees have ever been recorded on this event. Apply event registration id to all fees.
-            if (eventFeeList.size() > 0) {
+            if (! eventFeeList.isEmpty()) {
                 for (Integer ff = 0; ff < eventFeeList.size(); ff++) {
                     eventFeeList[ff].Event_Registration__c = evtInfo.evtRegId;
                 }
             }
         }
-        if (eventFeeList.size() > 0) {
+        if (! eventFeeList.isEmpty()) {
             CRUDtoDo.updateFees(eventFeeList);
         }
 
@@ -693,7 +693,7 @@ public with sharing class SummitEventsRegisterController {
                 optionPage = Page.SummitEventsRegisterAppointments;
             } else if (eventPage.Display_Optional_Donation__c) {
                 optionPage = Page.SummitEventsDonation;
-            } else if (eventFeeList.size() > 0) {
+            } else if (! eventFeeList.isEmpty()) {
                 optionPage = Page.SummitEventsSubmit;
             } else {
                 optionPage = Page.SummitEventsConfirmation;
@@ -777,7 +777,7 @@ public with sharing class SummitEventsRegisterController {
                         ORDER BY LastModifiedDate
                 ];
             }
-            if (foundRegistrations.size() > 0) {
+            if (! foundRegistrations.isEmpty()) {
                 foundRegistration = foundRegistrations[0];
             }
             return foundRegistration;

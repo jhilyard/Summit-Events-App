@@ -50,7 +50,7 @@ global class SummitEventsAppointmentItinerary_TDTM extends hed.TDTM_Runnable {
             Boolean isOvernight = false;
 
 
-            if (AllAppts.size() > 0) {
+            if (! AllAppts.isEmpty()) {
 
                 //check if this is an undergrad overnight
                 if (AllAppts[0].Event_Registration__r.Event_Name__c.contains('Overnight')) {

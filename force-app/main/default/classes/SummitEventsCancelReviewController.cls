@@ -32,7 +32,7 @@ public with sharing class SummitEventsCancelReviewController {
             ];
 
 
-            if (evtList.size() > 0) {
+            if (! evtList.isEmpty()) {
                 evt = evtList[0];
                 templateSelected = evt.Event__r.Template__c;
 

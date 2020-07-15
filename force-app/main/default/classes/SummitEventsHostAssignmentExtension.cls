@@ -48,7 +48,7 @@ public with sharing class SummitEventsHostAssignmentExtension {
     public PageReference assignHost() {
         SEApt.Event_Host__c = hostId;
         List<Summit_Events_Host__c> addedHostList = [SELECT Remaining__c, Assigned__c, Max_Available__c, Id FROM Summit_Events_Host__c WHERE Id = :hostId];
-        if (addedHostList.size() > 0) {
+        if (! addedHostList.isEmpty()) {
             if (addedHostList[0].Remaining__c > 0) {
                 Summit_Events_Host__c newHost = new Summit_Events_Host__c(Id = hostId);
                 if (hostAction == 'assign') {

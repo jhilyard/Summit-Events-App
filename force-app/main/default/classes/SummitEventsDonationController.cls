@@ -28,7 +28,7 @@ public with sharing class SummitEventsDonationController {
                 WHERE Id = :eventInfo.instanceID
         ];
 
-        if (eventInstanceList.size() > 0) {
+        if (! eventInstanceList.isEmpty()) {
             eventInstance = eventInstanceList[0];
             templateSelected = eventInstance.Event__r.Template__c;
 
@@ -40,7 +40,7 @@ public with sharing class SummitEventsDonationController {
                     AND Event_Fee_Type__c = 'Optional Donation'
             ];
 
-            if (previousDonationFees.size() > 0) {
+            if (! previousDonationFees.isEmpty()) {
                 incomingFee = previousDonationFees[0];
                 System.debug('INCOMING FEE: ' + incomingFee);
                 donationRecipient = incomingFee.Event_Fee_Attribute__c;
@@ -143,7 +143,7 @@ public with sharing class SummitEventsDonationController {
                 AND (Restrict_To_Instance_Title__r.Instance_Title__c = :eventInstance.Instance_Title__c OR Restrict_To_Instance_Title__r.Instance_Title__c = null)
                 AND Appointment_Type_Status__c = 'Active'
         ];
-        if (apptTypes.size() > 0) {
+        if (! apptTypes.isEmpty()) {
             prevPage = Page.SummitEventsRegisterAppointments;
         }
         return prevPage;

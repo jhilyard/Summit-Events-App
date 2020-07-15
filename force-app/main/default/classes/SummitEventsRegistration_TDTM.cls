@@ -26,7 +26,7 @@ global class SummitEventsRegistration_TDTM extends hed.TDTM_Runnable {
 
                 //Get old Summit_Events_Registration__c by current ID
                 Summit_Events_Registration__c oldReg = new Summit_Events_Registration__c(Status__c = 'new', Substatus__c='new');
-                if (oldListMap.size() > 0) {
+                if (! oldListMap.isEmpty()) {
                     if (r.Id != null) {
                         oldReg = oldListMap.get(r.Id);
                     }
@@ -83,7 +83,7 @@ global class SummitEventsRegistration_TDTM extends hed.TDTM_Runnable {
                     footOnCampus.add(footContact);
                 }
             }
-            if (footOnCampus.size() > 0) {
+            if (! footOnCampus.isEmpty()) {
                 upsert footOnCampus;
             }
             //Get any templates for events that have restistration status changes
@@ -191,7 +191,7 @@ global class SummitEventsRegistration_TDTM extends hed.TDTM_Runnable {
                 }
             }
 
-            if (activityUpdates.size() > 0) {
+            if (! activityUpdates.isEmpty()) {
                 insert activityUpdates;
             }
         }
@@ -208,7 +208,7 @@ global class SummitEventsRegistration_TDTM extends hed.TDTM_Runnable {
             BCCString = BCCString.replaceAll('\\s+', '');
             BCCString = BCCString.replaceAll(';', ',');
             List<String> bccList = BCCString.split(',');
-            if (bccList.size() > 0) {
+            if (! bccList.isEmpty()) {
                 mail.setBccAddresses(bccList);
             }
         }
