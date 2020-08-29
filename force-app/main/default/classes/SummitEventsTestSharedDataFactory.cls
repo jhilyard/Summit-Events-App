@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 // Created by Thaddaeus Dahlberg on 4/2/2019.
 
-@isTest
+@IsTest
 public with sharing class SummitEventsTestSharedDataFactory {
 
     public static Summit_Events_Instance__c createTestEvent(
@@ -40,7 +40,7 @@ public with sharing class SummitEventsTestSharedDataFactory {
                 Location_Title__c = 'A location',
                 Location_Map_Link__c = 'Map Link 1',
                 Location_Address__c = '123 Electric Ave.',
-                Location_Type__c = 'Minneapolis',
+                Location_Type__c = 'On-Site',
                 Contact_Matching_Rules__c = matchingRules
         );
 
@@ -116,15 +116,15 @@ public with sharing class SummitEventsTestSharedDataFactory {
                 Event__c = testEvent.Id,
                 Instance_Title__c = testEventName + ' Sesssion',
                 Instance_Start_Date__c = Date.today().addDays(1),
-                Instance_Start_Time__c = Time.newInstance(8,0,0,0),
+                Instance_Start_Time__c = Time.newInstance(8, 0, 0, 0),
                 Instance_End_Date__c = Date.today().addDays(1),
-                Instance_End_Time__c = Time.newInstance(14,0,0,0),
+                Instance_End_Time__c = Time.newInstance(14, 0, 0, 0),
                 Active_Status__c = 'Active',
                 Capacity__c = 500,
                 Location_Title_Override__c = 'A location',
                 Location_Map_Link_Override__c = 'Map Link 1',
                 Location_Address_Override__c = '123 Electric Ave.',
-                Location_Type_Override__c = 'Minneapolis'
+                Location_Type_Override__c = 'Online'
         );
         insert testInstance;
 
@@ -132,9 +132,9 @@ public with sharing class SummitEventsTestSharedDataFactory {
                 Event__c = testEvent.Id,
                 Instance_Title__c = testEventName + ' Sesssion 2',
                 Instance_Start_Date__c = Date.today().addDays(3),
-                Instance_Start_Time__c = Time.newInstance(8,0,0,0),
+                Instance_Start_Time__c = Time.newInstance(8, 0, 0, 0),
                 Instance_End_Date__c = Date.today().addDays(3),
-                Instance_End_Time__c = Time.newInstance(14,0,0,0),
+                Instance_End_Time__c = Time.newInstance(14, 0, 0, 0),
                 Active_Status__c = 'Active',
                 Capacity__c = 500
         );
@@ -188,7 +188,7 @@ public with sharing class SummitEventsTestSharedDataFactory {
                 Event__c = evtInst.Event__c
         );
 
-        List<OrgWideEmailAddress> oweList = [SELECT Id, Address,DisplayName, IsAllowAllProfiles from OrgWideEmailAddress WHERE IsAllowAllProfiles = true];
+        List<OrgWideEmailAddress> oweList = [SELECT Id, Address,DisplayName, IsAllowAllProfiles FROM OrgWideEmailAddress WHERE IsAllowAllProfiles = TRUE];
 
         if (oweList.size() > 0) {
             testEvtEmail.Org_Email_Id__c = oweList[0].Id;
@@ -217,7 +217,6 @@ public with sharing class SummitEventsTestSharedDataFactory {
         Contact student = new Contact(
                 firstName = firstName,
                 lastName = lastName,
-                Preferred_First_Name__c = preferredFirst,
                 Email = Email,
                 MailingStreet = '123 Flinstone Ave',
                 MailingCity = 'Bedrock',
@@ -225,7 +224,6 @@ public with sharing class SummitEventsTestSharedDataFactory {
                 MailingPostalCode = Zip,
                 Phone = Phone,
                 Birthdate = Date.valueOf(DOB),
-                Preferred_Class_Year__c = ClassYear,
                 AccountId = a.Id
         );
         insert student;
@@ -233,37 +231,6 @@ public with sharing class SummitEventsTestSharedDataFactory {
         return student;
 
     }
-
-//    Public static User createUserByContactId(Id cId) {
-//        User publicUser = [Select Name, Id From User WHERE Name = 'University of St. Thomas Site Guest User' LIMIT 1];
-//        System.runAs (publicUser) {
-//            Profile pr = [Select Id From Profile Where Name = 'Alumni Community User'][0];
-//
-//            UserRole ur = [Select Id From UserRole Where Name = 'Director'][0];
-//
-//            Contact student = [SELECT Id,firstName,lastName,Email FROM Contact WHERE Id = :cId][0];
-//
-//            User testUser = new User(
-//                    LanguageLocaleKey = 'en_US',
-//                    TimeZoneSidKey = 'America/Chicago',
-//                    LocaleSidKey = 'en_US',
-//                    FirstName = student.firstName,
-//                    LastName = student.lastName,
-//                    Username = student.Email,
-//                    CommunityNickname = 'testUser123',
-//                    EmailEncodingKey = 'UTF-8',
-//                    Alias = 't1',
-//                    Email = student.Email,
-//                    ContactId = student.Id,
-//                    UserRoleId = ur.Id,
-//                    ProfileId = pr.Id,
-//                    Profile = pr
-//            );
-//
-//            return testUser;
-//        }
-//        return null;
-//    }
 
     public static Summit_Events_Registration__c createEventRegistration(Summit_Events_Instance__c evtI, String firstName, String lastName, String Email, String Zip, String DOB, String ClassYear, Id optionalContactLinkId) {
 

@@ -44,19 +44,20 @@ public with sharing class SummitEventsCancelReviewController {
                         WHERE Event_Registration__c = :regId
                 ];
 
-                if (SEShared.convertDateToDatetime(evt.Event_Instance__r.Instance_End_Date__c, evt.Event_Instance__r.Instance_End_Time__c) < SEShared.adjustForCentralTime(Datetime.now())) {
-                    eventOver = true;
-                }
 
                 List<Summit_Events_Instance__c> eventInstance = [
                         SELECT Id, Event__r.Event_Name__c, Instance_Title__c,
                                 Instance_Start_Date__c, Instance_End_Date__c, Instance_Start_Time__c, Instance_End_Time__c, Instance_Time_Zone__c
                         FROM Summit_Events_Instance__c W
-                                WHERE Id = :evt.Event_Instance__c
+                        WHERE Id = :evt.Event_Instance__c
                 ];
 
-                If (eventInstance.size()>0) {
-                    navBreadCrumb = SEShared.navBreadcrumbBuilder(eventInstance[0],false);
+                if (SEShared.convertDateToDatetime(evt.Event_Instance__r.Instance_End_Date__c, null, '') < SEShared.adjustForTimeZone(Datetime.now(), evt.Event_Instance__r.Instance_Time_Zone__c)) {
+                    eventOver = true;
+                }
+
+                If (eventInstance.size() > 0) {
+                    navBreadCrumb = SEShared.navBreadcrumbBuilder(eventInstance[0], false);
                 }
 
 

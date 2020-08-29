@@ -88,22 +88,7 @@ public with sharing class SummitEventsSubmitController {
                     LIMIT 1
             ];
 
-//            if (evtInstance.Start_Date_Time__c != null && evtInstance.End_Date_Time__c != null) {
-//                eventStartDateTimeCrumb = evtInstance.Start_Date_Time__c.format('MMMM d, YYYY, h:mm a') + ' - ' + evtInstance.End_Date_Time__c.format('h:mm a');
-//            }
-
-            List<Summit_Events_Appointment_Type__c> apptTypes = [
-                    SELECT Id
-                    From Summit_Events_Appointment_Type__c
-                    WHERE Summit_Events__c = :evtInfo.evtId
-                    AND (Restrict_To_Instance_Title__r.Instance_Title__c = :evtInstance.Instance_Title__c OR Restrict_To_Instance_Title__r.Instance_Title__c = null)
-            ];
-
-            eventHasOptions = ! apptTypes.isEmpty();
-
-            previousPageURL = previousPage().getUrl();
-            
-            navBreadCrumb = SEShared.navBreadcrumbBuilder(evtInstance,false);
+            navBreadCrumb = SEShared.navBreadcrumbBuilder(evtInstance, false);
         }
 
 

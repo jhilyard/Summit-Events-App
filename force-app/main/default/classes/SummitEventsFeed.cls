@@ -18,18 +18,19 @@ global with sharing class SummitEventsFeed {
         public String longDesc { get; set; }
         public Datetime endDate { get; set; }
         public DateTime start { get; set; }
+        public String timezone { get; set; }
         public String eventUrl { get; set; }
         public Boolean eventClosed { get; set; }
         public String className { get; set; }
-        public String locationTitle { get; set; } 
+        public String locationTitle { get; set; }
         public String locationType { get; set; }
         public String locationAddress { get; set; }
         public String locationMapLink { get; set; }
         public String locationBuilding { get; set; }
         public String feedButtonText { get; set; }
-        public String sponsors {get;set;}
-        public Integer capacityTotal {get;set;}
-        public Integer capacityRemaining {get;set;}
+        public String sponsors { get; set; }
+        public Integer capacityTotal { get; set; }
+        public Integer capacityRemaining { get; set; }
     }
 
     @HttpGet
@@ -51,7 +52,7 @@ global with sharing class SummitEventsFeed {
         if (feedType == 'audienceDD') {
             serializedJSON = JSON.serialize(getAudienceDD(Summit_Events__c.Audience__c.getDescribe()));
         } else if (feedType == 'sexDD') {
-            serializedJSON = JSON.serialize(getAudienceDD(Contact.hed__Gender__c.getDescribe()));
+            serializedJSON = JSON.serialize(getAudienceDD(Summit_Events_Registration__c.Registrant_Gender__c.getDescribe()));
         } else if (feedType == 'eventList') {
             serializedJSON = JSON.serialize(getEventList());
             serializedJSON = serializedJSON.replace('"endDate":', '"end":');
@@ -64,6 +65,13 @@ global with sharing class SummitEventsFeed {
 
 
     private static List<eventItem> getEventList() {
+
+        //Get namespace if packaged
+        String namespace = SummitEventsNamespace.getNamespace();
+        if (String.isNotBlank(namespace)) {
+            namespace = namespace + '__';
+        }
+
         List<eventItem> EventList = new List<eventItem>();
         RestRequest req = RestContext.request;
         String eventQuery = '';
@@ -77,39 +85,61 @@ global with sharing class SummitEventsFeed {
         eventQuery += ' WHERE ';
         eventQuery += ' Event__R.Event_Status__c = \'Active\' ';
         eventQuery += ' AND Active_Status__c = \'Active\' ';
-        eventQuery += ' AND (Current_Available_Capacity__c > 0 OR Capacity__c = null) ';
         eventQuery += ' AND Event__r.Private_Event__c = false ';
         eventQuery += ' AND Private_Instance__c = false ';
+
+        Boolean hideClosed = false;
+        if (String.isNotBlank(req.params.get('hideClosed'))) {
+            try {
+                hideClosed = Boolean.valueOf(req.params.get('hideClosed'));
+            } catch (Exception e) {
+                hideClosed = false;
+            }
+        }
+        if (hideClosed) {
+            eventQuery += ' AND (Current_Available_Capacity__c > 0 OR Capacity__c = null) ';
+        }
+
 
         // build and sanitize the where statement that have variables
 
         // get start and end view times convert string to datetime then convert back into string to sanitize
-        DateTime viewStart = DateTime.newInstance(Date.today(), Time.newInstance(0, 0, 0, 0)).addMonths(-1);
-        DateTime viewEnd = DateTime.newInstance(Date.today(), Time.newInstance(0, 0, 0, 0)).addMonths(1);
+        DateTime viewStart = null;
+        DateTime viewEnd = null;
         ///.formatGmt('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'');
         String formattedViewStart;
         String formattedViewEnd;
-
         if (String.isNotBlank(req.params.get('viewStart'))) {
-            String viewStartString = req.params.get('viewStart').trim();
-            if (!viewStartString.containsIgnoreCase(' ')) {
-                viewStartString = viewStartString + ' 00:00:00';
-            }
-            viewStart = DateTime.valueOf(viewStartString);
+            viewStart = Date.valueOf(req.params.get('viewStart'));
         }
+        //if fullcalendar in use start is passed. start being protected variable
+        if (String.isNotBlank(req.params.get('start'))) {
+            viewStart = Date.valueOf(req.params.get('start'));
+        } else {
+            viewStart = DateTime.newInstance(Date.today(), Time.newInstance(0, 0, 0, 0)).addMonths(-1);
+        }
+
+        System.debug(viewStart);
+
         if (String.isNotBlank(req.params.get('viewEnd'))) {
-            String viewEndString = req.params.get('viewEnd').trim();
-            if (!viewEndString.containsIgnoreCase(' ')) {
-                viewEndString = viewEndString + ' 23:59:59';
-            }
-            viewEnd = DateTime.valueOf(req.params.get('viewEnd'));
+            viewEnd = Date.valueOf(req.params.get('viewEnd'));
         }
+        //if fullcalendar in use end is passed. end being protected variable
+        if (String.isNotBlank(req.params.get('end'))) {
+            viewEnd = Date.valueOf(req.params.get('end'));
+        } else {
+            viewEnd = DateTime.newInstance(Date.today(), Time.newInstance(0, 0, 0, 0)).addMonths(1);
+
+        }
+
+        System.debug(viewEnd);
+
         formattedViewStart = viewStart.format('yyyy-MM-dd');
         formattedViewEnd = viewEnd.format('yyyy-MM-dd');
         eventQuery += ' AND Instance_Start_Date__c >= ' + formattedViewStart + ' ';
         eventQuery += ' AND Instance_Start_Date__c <= ' + formattedViewEnd + ' ';
 
-        //build and sanitize
+        System.debug(eventQuery);
 
         //get event based on event id
         String eventId = req.params.get('eventId');
@@ -178,7 +208,7 @@ global with sharing class SummitEventsFeed {
         for (Summit_Events_Instance__c eventInstance : EventInstanceList) {
             regDateOpenDate = Datetime.now().addDays(-1);
             if (eventInstance.Event__r.Close_Event_Days_Before__c != null && eventInstance.Event__r.Close_Event_Days_Before__c != 0) {
-                regDateOpenDate = SEShared.adjustForCentralTime(Datetime.now());
+                regDateOpenDate = SEShared.adjustForTimeZone(Datetime.now(), eventInstance.Instance_Time_Zone__c);
                 regDateOpenDate = regDateOpenDate.addDays((Integer.valueOf(eventInstance.Event__r.Close_Event_Days_Before__c) + 1));
             }
             eventItem evt = new eventItem();
@@ -207,7 +237,11 @@ global with sharing class SummitEventsFeed {
                 evt.FeedButtonText = 'Register';
             }
 
-            if (String.isNotBlank(eventInstance.Location_Type_Override__c)) {
+            if (!String.isBlank(eventInstance.Instance_Time_Zone__c)) {
+                evt.timezone = eventInstance.Instance_Time_Zone__c;
+            }
+
+            if (!String.isBlank(eventInstance.Location_Type_Override__c)) {
                 evt.locationType = eventInstance.Location_Type_Override__c;
             } else if (String.isNotBlank(eventInstance.Event__r.Location_Type__c)) {
                 evt.locationType = eventInstance.Event__r.Location_Type__c;
@@ -252,10 +286,11 @@ global with sharing class SummitEventsFeed {
             }
 
             if (eventInstance.Instance_Start_Date__c != null) {
-               evt.start = SEShared.convertDateToDatetime(eventInstance.Instance_Start_Date__c, eventInstance.Instance_Start_Time__c);
+                evt.start = SEShared.convertDateToDatetime(eventInstance.Instance_Start_Date__c, eventInstance.Instance_Start_Time__c, '');
+
             }
             if (eventInstance.Instance_End_Date__c != null) {
-                evt.endDate = SEShared.convertDateToDatetime(eventInstance.Instance_End_Date__c, eventInstance.Instance_End_Time__c);
+                evt.endDate = SEShared.convertDateToDatetime(eventInstance.Instance_End_Date__c, eventInstance.Instance_End_Time__c, '');
             }
 
             if (String.isNotBlank(eventInstance.Event__r.Location_Title__c) || String.isNotBlank(eventInstance.Location_Title_Override__c)) {
@@ -288,10 +323,13 @@ global with sharing class SummitEventsFeed {
                 evt.locationMapLink = '';
             }
 
-            if (evt.start < regDateOpenDate) {
+            if (evt.start < regDateOpenDate || eventInstance.Current_Available_Capacity__c <= 0) {
                 evt.eventClosed = true;
-                evt.eventUrl = 'javascript:void(0);';
+                evt.eventUrl = 'javascript:;';
                 evt.className = 'eventClosed';
+                if (!hideClosed) {
+                    EventList.add(evt);
+                }
             } else {
                 evt.eventClosed = false;
                 if (String.isNotBlank(eventInstance.Event__r.Alternate_Registration_URL__c) || String.isNotBlank(eventInstance.Alternate_Registration_URL_Override__c)) {
@@ -302,12 +340,11 @@ global with sharing class SummitEventsFeed {
                     }
 
                 } else {
-                    evt.eventUrl = eventInstance.Event__r.Community_Base_URL__c + 'SummitEventsRegister?instanceID=' + eventInstance.Id;
+                    evt.eventUrl = eventInstance.Event__r.Community_Base_URL__c + namespace + 'SummitEventsRegister?instanceID=' + eventInstance.Id;
                 }
                 evt.className = 'eventOpened';
+                EventList.add(evt);
             }
-
-            EventList.add(evt);
         }
         return EventList;
     }

@@ -62,8 +62,7 @@ public with sharing class SummitEventsRegisterAppointmentCtlr {
 
 
                 if (evtInstance != null) {
-                    //Datetime rightNow = SEShared.adjustForCentralTime(Datetime.now());
-                    String dayOfWeek = SEShared.convertDateToDatetime(evtInstance.Instance_Start_Date__c,null).format('EEEE');
+                    String dayOfWeek = SEShared.convertDateToDatetime(evtInstance.Instance_Start_Date__c, null, '').format('EEEE');
                     // = dayOfWeek;
                     //Build available appointments
                     appts = new Map<ID, Summit_Events_Appointment_Type__c>([
@@ -80,7 +79,7 @@ public with sharing class SummitEventsRegisterAppointmentCtlr {
                             ORDER BY Sort_Order__c ASC NULLS LAST
                     ]);
 
-                    navBreadCrumb = SEShared.navBreadcrumbBuilder(evtInstance,false);
+                    navBreadCrumb = SEShared.navBreadcrumbBuilder(evtInstance, false);
 
                     //Check if the user gets to select any appointments or they are all auto added
                     for (Summit_Events_Appointment_Type__c chosenCheck : appts.values()) {
@@ -133,7 +132,7 @@ public with sharing class SummitEventsRegisterAppointmentCtlr {
                             chosenFormatted += '<p class="appointmentDesc">' + cappt.Description__c + '</p>';
                         }
                         IF (cappt.Chosen_State__c != 'Added and Required' && cappt.Chosen_State__c != 'Added but not shown') {
-                            chosenFormatted += '<a href="javascript:;" class="appointmentRemove" title="Remove Appointment">Remove</a>';
+                            chosenFormatted += '<a href="javascript:;" class="appointmentRemove slds-button slds-button_neutral" title="Remove Appointment">Remove</a>';
                         }
 
                         chosenFormatted += '</div>';
