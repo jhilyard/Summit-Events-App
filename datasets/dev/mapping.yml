@@ -6,12 +6,6 @@ Insert Summit_Events_Fee_Attribute__c:
     Name: Name
     Banner_Index__c: Banner_Index__c
     FOAPAL__c: FOAPAL__c
-Insert hed__Language__c:
-  sf_object: hed__Language__c
-  table: hed__Language__c
-  fields:
-    Id: sf_id
-    Name: Name
 Insert Summit_Events__c:
   sf_object: Summit_Events__c
   table: Summit_Events__c

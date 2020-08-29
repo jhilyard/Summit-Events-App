@@ -437,7 +437,7 @@ public with sharing class SummitEventsRegisterController {
 
         if (String.isNotBlank(eventPage.Registration_Email_Restriction__c) && eventPage.Registration_Email_Restriction__c != 'No Limit') {
             System.debug('GOT TO REGISTRANT EMAIL RESTRICTIONS');
-            Summit_Events_Registration__c foundRegistration = CRUDtoDO.checkForOtherRegistrations(eventPage.Registration_Email_Restriction__c, newEvtReg.Registrant_Email__c, evtInstance.Id, eventPage.Id);
+            Summit_Events_Registration__c foundRegistration = rCRUD.checkForOtherRegistrations(eventPage.Registration_Email_Restriction__c, newEvtReg.Registrant_Email__c, evtInstance.Id, eventPage.Id);
             if (foundRegistration != null) {
                 ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.ERROR, 'It appears you’ve already registered for this event. Please contact the Event Host for more information.');
                 ApexPages.addMessage(myMsg);
@@ -518,7 +518,7 @@ public with sharing class SummitEventsRegisterController {
                     AND Id NOT IN :recordedUsedIds
             ];
             if (deleteEventFees.size() > 0) {
-                CRUDtoDo.deleteFees(deleteEventFees);
+                rCRUD.deleteFees(deleteEventFees);
             }
         } else {
             //No Fees have ever been recorded on this event. Apply event registration id to all fees.
@@ -529,11 +529,11 @@ public with sharing class SummitEventsRegisterController {
             }
         }
         if (eventFeeList.size() > 0) {
-            CRUDtoDo.updateFees(eventFeeList);
+            rCRUD.updateFees(eventFeeList);
         }
 
         //update registration it may already exist, and matching log has to be updated on new registration inserts
-        newEvtReg = CRUDtoDO.updateRegistration(newEvtReg);
+        newEvtReg = rCRUD.updateRegistration(newEvtReg);
         System.debug(JSON.serializePretty(newEvtReg));
 
         if (String.isNotBlank(evtInfo.evtRegId) && evtInfo.evtRegId != 'COMING') {
@@ -561,7 +561,7 @@ public with sharing class SummitEventsRegisterController {
         return null;
     }
 
-    private without sharing class doCRUD {
+    private without sharing class registrationCRUD {
 
         public Summit_Events_Registration__c updateRegistration(Summit_Events_Registration__c newEvtReg) {
             try {
